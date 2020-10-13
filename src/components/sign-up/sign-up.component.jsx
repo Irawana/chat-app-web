@@ -23,7 +23,7 @@ class SignUp extends React.Component {
     const { createUser } = this.props;
     const { firstName, lastName, username, password } = this.state;
 
-    createUser(firstName, lastName, username, password);
+    await createUser(firstName, lastName, username, password);
 
     this.setState({
       firstName: "",

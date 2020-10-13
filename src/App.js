@@ -16,7 +16,7 @@ class App extends Component {
     const { currentUser, setCurrentUser, getUsers } = this.props;
     this.unsubscribeFromAuth = () => setCurrentUser(currentUser);
 
-    if (currentUser) getUsers();
+    getUsers();
   }
 
   componentWillUnmount() {

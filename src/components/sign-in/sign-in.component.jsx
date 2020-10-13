@@ -21,7 +21,7 @@ class SignIn extends React.Component {
     const { login } = this.props;
     const { username, password } = this.state;
 
-    login(username, password);
+    await login(username, password);
 
     this.setState({
       username: "",

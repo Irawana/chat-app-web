@@ -55,7 +55,6 @@ export const getUsers = () => {
 
     try {
       const users = (await fetchUsers()).data;
-      console.log(users);
       dispatch(getUsersSuccess(users));
     } catch (error) {
       dispatch(getUsersFailure(error));
