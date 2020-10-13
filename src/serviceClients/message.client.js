@@ -11,8 +11,8 @@ export const saveMessage = async (user) => {
   return await res.json();
 };
 
-export const fetchMessages = async (userId) => {
-  const res = await fetch(`${apiUrl}/messages/${userId}`, {
+export const fetchMessages = async (user1Id, user2Id) => {
+  const res = await fetch(`${apiUrl}/message/${user1Id}/${user2Id}`, {
     method: "GET",
     headers: headerWithAuth,
   });

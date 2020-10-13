@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import socketIOClient from "socket.io-client";
 import { createStructuredSelector } from "reselect";
 import "./chat.styles.scss";
 import {
   selectUsersList,
   selectCurrentUser,
 } from "../../redux/user/user.selectors";
+import { selectMessagesList } from "../../redux/message/message.selectors";
 import { logout } from "../../redux/user/user.actions";
-import {
-  fetchMessages,
-  saveMessage,
-} from "../../serviceClients/message.client";
+import { getMessages } from "../../redux/message/message.actions";
+import { saveMessage } from "../../serviceClients/message.client";
 
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -26,6 +26,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
 import MessageItem from "../../components/messageItem/message-item.component";
+import { apiUrl } from "../../config";
 
 const drawerWidth = 240;
 
@@ -67,9 +68,19 @@ const ChatPage = (props) => {
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [chatUser, setChatUser] = useState(undefined);
-  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const { users, logout, currentUser } = props;
+  const { users, logout, currentUser, getMessages, messages } = props;
+
+  useEffect(() => {
+    const socket = socketIOClient(apiUrl);
+
+    const from = currentUser.id;
+    const to = chatUser._id;
+
+    socket.on(`io.from.${from}.to.${to}`, (data) => {
+      getMessages(from, to);
+    });
+  });
 
   //Handle toggle of the drawer
   const handleDrawerToggle = () => {
@@ -81,8 +92,7 @@ const ChatPage = (props) => {
     setChatUser(user);
 
     //Get previous messages for selected user
-    const usersMessages = (await fetchMessages(user._id)).data;
-    setMessages(usersMessages);
+    getMessages(currentUser.id, chatUser._id);
   };
 
   //Handle on chane event of the message text
@@ -108,8 +118,7 @@ const ChatPage = (props) => {
     }
 
     const messageToCreate = { from: currentUser.id, to: chatUser._id, message };
-    const createdMsg = (await saveMessage(messageToCreate)).data;
-    setMessages([...messages, createdMsg]);
+    await saveMessage(messageToCreate); //TODO: move to redux actions
 
     setMessage("");
   };
@@ -198,7 +207,7 @@ const ChatPage = (props) => {
             <MessageItem key={msg._id} msg={msg} authUser={currentUser.id} />
           ))}
         </ul>
-        <form className="chat-form" action="">
+        <form className="chat-form">
           <input
             id="m"
             autoComplete="off"
@@ -217,10 +226,12 @@ const ChatPage = (props) => {
 const mapStateToProps = createStructuredSelector({
   users: selectUsersList,
   currentUser: selectCurrentUser,
+  messages: selectMessagesList,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   logout: () => dispatch(logout()),
+  getMessages: (from, to) => dispatch(getMessages(from, to)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatPage);
