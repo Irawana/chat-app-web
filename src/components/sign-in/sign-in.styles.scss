@@ -1,0 +1,25 @@
+.sign-in {
+  width: 50%;
+  min-width: 300px;
+  margin: 20px auto;
+
+  .sign-in-form {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+
+    .errors {
+      margin-top: 10px;
+      padding: 5px;
+      font-size: 10px;
+      background-color: lightpink;
+      color: red;
+      text-align: left;
+    }
+
+    Button {
+      margin: 20px auto;
+      width: 50%;
+    }
+  }
+}
