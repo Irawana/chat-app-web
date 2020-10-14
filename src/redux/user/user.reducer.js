@@ -2,6 +2,7 @@ import userActionTypes from "./user.types";
 
 const INITIAL_STATE = {
   currentUser: null,
+  selectedUser: null,
   usersList: [],
   loading: false,
   errorMessage: undefined,
@@ -42,10 +43,10 @@ const userReducer = (state = INITIAL_STATE, action) => {
         currentUser: action.payload,
       };
 
-    case userActionTypes.SET_CHAT_USER:
+    case userActionTypes.SET_SELECTED_USER:
       return {
         ...state,
-        chatUser: action.payload,
+        selectedUser: action.payload,
       };
 
     case userActionTypes.GET_USERS_REQUEST:

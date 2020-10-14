@@ -34,6 +34,17 @@ export const userLogin = async (authData) => {
 };
 
 /**
+ * User logout
+ */
+export const userLogout = async () => {
+  await fetch(`${apiUrl}/auth/logout`, {
+    method: "POST",
+    headers: headerWithAuth,
+  });
+};
+
+
+/**
  * Get all users
  */
 export const fetchUsers = async () => {

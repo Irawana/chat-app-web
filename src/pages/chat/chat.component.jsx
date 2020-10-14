@@ -87,11 +87,15 @@ const ChatPage = (props) => {
     if (chatUser) {
       const socket = socketIOClient(apiUrl);
 
-      const from = currentUser._id;
-      const to = chatUser._id;
+      const from = chatUser._id;
+      const to = currentUser._id;
 
       socket.on(`io.from.${from}.to.${to}`, (data) => {
         getMessages(from, to);
+        console.log(".......... new message");
+      });
+      socket.on("API-CALL", (data) => {
+        console.log(`io.from.${from}.to.${to}`);
       });
     }
   }, [chatUser, currentUser, getMessages]);

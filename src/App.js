@@ -1,22 +1,18 @@
 import React, { Component } from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import "./App.css";
+import { Container } from "@material-ui/core";
+import Routes from "./Routes";
 import { setCurrentUser, getUsers } from "./redux/user/user.actions";
 import { selectCurrentUser } from "./redux/user/user.selectors";
-
-import ChatPage from "./pages/chat/chat.component";
-import SignInSignUpPage from "./pages/sign-in-sign-up/sign-in-sign-up.component";
 
 class App extends Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    const { currentUser, setCurrentUser, getUsers } = this.props;
+    const { currentUser, setCurrentUser } = this.props;
     this.unsubscribeFromAuth = () => setCurrentUser(currentUser);
-
-    if (currentUser) getUsers();
   }
 
   componentWillUnmount() {
@@ -24,27 +20,12 @@ class App extends Component {
   }
 
   render() {
-    const { currentUser } = this.props;
+    let { currentUser } = this.props;
 
     return (
-      <div className="app">
-        {
-          <Switch>
-            <Route
-              exact
-              path="/"
-              render={() =>
-                currentUser ? <Redirect to="/chat" /> : <SignInSignUpPage />
-              }
-            />
-            <Route
-              exact
-              path="/chat"
-              render={() => (currentUser ? <ChatPage /> : <SignInSignUpPage />)}
-            />
-          </Switch>
-        }
-      </div>
+      <Container maxWidth="md">
+        <Routes currentUser={currentUser} />
+      </Container>
     );
   }
 }

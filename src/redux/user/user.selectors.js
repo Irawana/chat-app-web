@@ -7,9 +7,9 @@ export const selectCurrentUser = createSelector(
   (user) => user.currentUser
 );
 
-export const selectChatUser = createSelector(
+export const selectSelectedUser = createSelector(
   [selectUser],
-  (user) => user.chatUser
+  (user) => user.selectedUser
 );
 
 export const selectUsersList = createSelector(

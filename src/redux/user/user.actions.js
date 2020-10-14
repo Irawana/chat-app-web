@@ -3,20 +3,21 @@ import {
   fetchUsers,
   saveUser,
   userLogin,
+  userLogout
 } from "../../serviceClients/user.client";
 
 /**
  * Login action
  *
- * @param {String} username
+ * @param {String} userName
  * @param {String} password
  */
-export const login = (username, password) => {
+export const login = (userName, password) => {
   return async (dispatch) => {
     dispatch(loginStart());
 
     try {
-      const { user, accessToken } = await userLogin({ username, password });
+      const { user, accessToken } = await userLogin({ userName, password });
 
       localStorage.setItem("accessToken", accessToken);
 
@@ -43,8 +44,14 @@ const loginFailure = (error) => ({
 
 /** Logout */
 export const logout = () => {
-  return {
-    type: userActionTypes.LOGOUT,
+  return async (dispatch) => {
+    await userLogout();
+
+    localStorage.removeItem("accessToken");
+
+    dispatch({
+      type: userActionTypes.LOGOUT,
+    });
   };
 };
 
@@ -59,14 +66,16 @@ export const setCurrentUser = (user) => ({
 });
 
 /**
- * Set currently chatting user
+ * Set selected user
  *
  * @param {Object} user
  */
-export const setChatUser = (user) => ({
-  type: userActionTypes.SET_CHAT_USER,
-  payload: user,
-});
+export const setSelectedUser = (user) => {
+  return {
+    type: userActionTypes.SET_SELECTED_USER,
+    payload: user,
+  };
+};
 
 /** Get users */
 export const getUsers = () => {
