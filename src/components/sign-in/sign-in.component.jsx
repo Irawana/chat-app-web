@@ -15,13 +15,13 @@ class SignIn extends React.Component {
     };
   }
 
-  handleSubmit = async (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
 
     const { login } = this.props;
     const { username, password } = this.state;
 
-    await login(username, password);
+    login(username, password);
 
     this.setState({
       username: "",

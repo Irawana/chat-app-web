@@ -28,6 +28,26 @@ const messageReducer = (state = INITIAL_STATE, action) => {
         loading: false,
       };
 
+    case messageActionTypes.CREATE_MESSAGE_REQUEST:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case messageActionTypes.CREATE_MESSAGE_SUCCESS:
+      return {
+        ...state,
+        messagesList: [...state.messagesList, action.payload],
+        loading: false,
+      };
+
+    case messageActionTypes.CREATE_MESSAGE_FAILURE:
+      return {
+        ...state,
+        errorMessage: action.payload,
+        loading: false,
+      };
+
     default:
       return state;
   }

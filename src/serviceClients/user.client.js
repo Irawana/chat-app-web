@@ -42,5 +42,9 @@ export const fetchUsers = async () => {
     headers: headerWithAuth,
   });
 
-  return await res.json();
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+
+  return res.json();
 };

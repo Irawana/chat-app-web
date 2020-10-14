@@ -16,7 +16,9 @@ export const login = (username, password) => {
     dispatch(loginStart());
 
     try {
-      const { user } = await userLogin({ username, password }); //TODO - need to implement access token
+      const { user, accessToken } = await userLogin({ username, password });
+
+      localStorage.setItem("accessToken", accessToken);
 
       dispatch(loginSuccess(user));
     } catch (error) {

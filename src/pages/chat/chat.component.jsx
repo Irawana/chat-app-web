@@ -10,8 +10,10 @@ import {
 } from "../../redux/user/user.selectors";
 import { selectMessagesList } from "../../redux/message/message.selectors";
 import { logout, setChatUser } from "../../redux/user/user.actions";
-import { getMessages } from "../../redux/message/message.actions";
-import { saveMessage } from "../../serviceClients/message.client";
+import {
+  getMessages,
+  createMessage,
+} from "../../redux/message/message.actions";
 
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -78,6 +80,7 @@ const ChatPage = (props) => {
     getMessages,
     messages,
     setChatUser,
+    createMessage,
   } = props;
 
   useEffect(() => {
@@ -133,7 +136,8 @@ const ChatPage = (props) => {
       to: chatUser._id,
       message,
     };
-    await saveMessage(messageToCreate); //TODO: move to redux actions
+
+    createMessage(messageToCreate);
 
     setMessage("");
   };
@@ -146,7 +150,13 @@ const ChatPage = (props) => {
         {users && users.length ? (
           users.map((user) =>
             user._id !== currentUser._id ? (
-              <ListItem button key={user._id}>
+              <ListItem
+                button
+                key={user._id}
+                style={
+                  user._id === chatUser._id ? { backgroundColor: "#eee" } : null
+                }
+              >
                 <div className="status-icon" />
                 <ListItemText
                   primary={`${user.firstName} ${user.lastName}`}
@@ -188,7 +198,6 @@ const ChatPage = (props) => {
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Hidden smUp implementation="css">
           <Drawer
-            //container={container}
             variant="temporary"
             anchor={theme.direction === "rtl" ? "right" : "left"}
             open={mobileOpen}
@@ -218,9 +227,15 @@ const ChatPage = (props) => {
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <ul id="messages">
-          {messages.map((msg) => (
-            <MessageItem key={msg._id} msg={msg} authUser={currentUser._id} />
-          ))}
+          {messages && messages.length
+            ? messages.map((msg) => (
+                <MessageItem
+                  key={msg._id}
+                  msg={msg}
+                  authUser={currentUser._id}
+                />
+              ))
+            : null}
         </ul>
         <form className="chat-form">
           <input
@@ -249,6 +264,7 @@ const mapDispatchToProps = (dispatch) => ({
   logout: () => dispatch(logout()),
   setChatUser: (user) => dispatch(setChatUser(user)),
   getMessages: (from, to) => dispatch(getMessages(from, to)),
+  createMessage: (message) => dispatch(createMessage(message)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatPage);
