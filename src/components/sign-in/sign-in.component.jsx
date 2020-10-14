@@ -11,7 +11,7 @@ class SignIn extends React.Component {
     this.state = {
       username: "",
       password: "",
-      errorMessage: undefined,
+      errorMessage: "",
     };
   }
 
@@ -26,7 +26,7 @@ class SignIn extends React.Component {
     this.setState({
       username: "",
       password: "",
-      errorMessage: "",
+      errorMessage: this.props.errorMessage,
     });
   };
 
@@ -42,7 +42,6 @@ class SignIn extends React.Component {
         <h2 className="title">Login</h2>
         <span>Please log in to continue</span>
 
-        {/* <form onSubmit={this.handleSubmit}> */}
         <form className="sign-in-form">
           <TextField
             onChange={this.handleChange}
@@ -59,9 +58,7 @@ class SignIn extends React.Component {
             required
             type="password"
           />
-          {this.state.errorMessage ? (
-            <span className="errors">test</span>
-          ) : null}
+          {/* <span className="errors">{this.state.errorMessage.message}</span> */}
 
           <Button
             variant="contained"

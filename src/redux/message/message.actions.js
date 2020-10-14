@@ -1,12 +1,19 @@
 import messageActionTypes from "./message.types";
 import { fetchMessages } from "../../serviceClients/message.client";
 
+/**
+ * Get messages for two users
+ *
+ * @param {String} from
+ * @param {String} to
+ */
 export const getMessages = (from, to) => {
   return async (dispatch) => {
     dispatch(getMessagesStart());
 
     try {
-      const messages = (await fetchMessages(from, to)).data;
+      const messages = await fetchMessages(from, to);
+
       dispatch(getMessagesSuccess(messages));
     } catch (error) {
       dispatch(getMessagesFailure(error));

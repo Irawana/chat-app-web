@@ -6,9 +6,10 @@ import "./chat.styles.scss";
 import {
   selectUsersList,
   selectCurrentUser,
+  selectChatUser,
 } from "../../redux/user/user.selectors";
 import { selectMessagesList } from "../../redux/message/message.selectors";
-import { logout } from "../../redux/user/user.actions";
+import { logout, setChatUser } from "../../redux/user/user.actions";
 import { getMessages } from "../../redux/message/message.actions";
 import { saveMessage } from "../../serviceClients/message.client";
 
@@ -63,24 +64,34 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/** Chat page */
 const ChatPage = (props) => {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [chatUser, setChatUser] = useState(undefined);
   const [message, setMessage] = useState("");
-  const { users, logout, currentUser, getMessages, messages } = props;
+  const {
+    users,
+    logout,
+    currentUser,
+    chatUser,
+    getMessages,
+    messages,
+    setChatUser,
+  } = props;
 
   useEffect(() => {
-    const socket = socketIOClient(apiUrl);
+    if (chatUser) {
+      const socket = socketIOClient(apiUrl);
 
-    const from = currentUser.id;
-    const to = chatUser._id;
+      const from = currentUser._id;
+      const to = chatUser._id;
 
-    socket.on(`io.from.${from}.to.${to}`, (data) => {
-      getMessages(from, to);
-    });
-  });
+      socket.on(`io.from.${from}.to.${to}`, (data) => {
+        getMessages(from, to);
+      });
+    }
+  }, [chatUser, currentUser, getMessages]);
 
   //Handle toggle of the drawer
   const handleDrawerToggle = () => {
@@ -88,11 +99,11 @@ const ChatPage = (props) => {
   };
 
   //Handle select user
-  const selectUser = async (user) => {
+  const selectUser = (user) => {
     setChatUser(user);
 
     //Get previous messages for selected user
-    getMessages(currentUser.id, chatUser._id);
+    getMessages(currentUser._id, user._id);
   };
 
   //Handle on chane event of the message text
@@ -117,7 +128,11 @@ const ChatPage = (props) => {
       return;
     }
 
-    const messageToCreate = { from: currentUser.id, to: chatUser._id, message };
+    const messageToCreate = {
+      from: currentUser._id,
+      to: chatUser._id,
+      message,
+    };
     await saveMessage(messageToCreate); //TODO: move to redux actions
 
     setMessage("");
@@ -130,7 +145,7 @@ const ChatPage = (props) => {
       <List>
         {users && users.length ? (
           users.map((user) =>
-            user._id !== currentUser.id ? (
+            user._id !== currentUser._id ? (
               <ListItem button key={user._id}>
                 <div className="status-icon" />
                 <ListItemText
@@ -204,7 +219,7 @@ const ChatPage = (props) => {
         <div className={classes.toolbar} />
         <ul id="messages">
           {messages.map((msg) => (
-            <MessageItem key={msg._id} msg={msg} authUser={currentUser.id} />
+            <MessageItem key={msg._id} msg={msg} authUser={currentUser._id} />
           ))}
         </ul>
         <form className="chat-form">
@@ -226,11 +241,13 @@ const ChatPage = (props) => {
 const mapStateToProps = createStructuredSelector({
   users: selectUsersList,
   currentUser: selectCurrentUser,
+  chatUser: selectChatUser,
   messages: selectMessagesList,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   logout: () => dispatch(logout()),
+  setChatUser: (user) => dispatch(setChatUser(user)),
   getMessages: (from, to) => dispatch(getMessages(from, to)),
 });
 

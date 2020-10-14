@@ -16,3 +16,8 @@ export const selectUsersList = createSelector(
   [selectUser],
   (user) => user.usersList
 );
+
+export const selectError = createSelector(
+  [selectUser],
+  (user) => user.errorMessage
+);

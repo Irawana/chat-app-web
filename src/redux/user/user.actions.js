@@ -5,16 +5,22 @@ import {
   userLogin,
 } from "../../serviceClients/user.client";
 
+/**
+ * Login action
+ *
+ * @param {String} username
+ * @param {String} password
+ */
 export const login = (username, password) => {
   return async (dispatch) => {
     dispatch(loginStart());
 
-    const response = await userLogin({ username, password });
+    try {
+      const { user } = await userLogin({ username, password }); //TODO - need to implement access token
 
-    if (response.status === 200) {
-      dispatch(loginSuccess(response.data));
-    } else {
-      dispatch(loginFailure(response.message));
+      dispatch(loginSuccess(user));
+    } catch (error) {
+      dispatch(loginFailure(error));
     }
   };
 };
@@ -33,28 +39,40 @@ const loginFailure = (error) => ({
   payload: error,
 });
 
+/** Logout */
 export const logout = () => {
   return {
     type: userActionTypes.LOGOUT,
   };
 };
 
+/**
+ * Set current auth user
+ *
+ * @param {Object} user
+ */
 export const setCurrentUser = (user) => ({
   type: userActionTypes.SET_CURRENT_USER,
   payload: user,
 });
 
+/**
+ * Set currently chatting user
+ *
+ * @param {Object} user
+ */
 export const setChatUser = (user) => ({
   type: userActionTypes.SET_CHAT_USER,
   payload: user,
 });
 
+/** Get users */
 export const getUsers = () => {
   return async (dispatch) => {
     dispatch(getUsersStart());
-
     try {
-      const users = (await fetchUsers()).data;
+      const users = await fetchUsers();
+
       dispatch(getUsersSuccess(users));
     } catch (error) {
       dispatch(getUsersFailure(error));
@@ -76,6 +94,11 @@ const getUsersFailure = (error) => ({
   payload: error,
 });
 
+/**
+ * Create new user
+ *
+ * @param {Object} user
+ */
 export const createUser = (user) => {
   return async (dispatch) => {
     dispatch(createUserStart());
